@@ -19,18 +19,25 @@ import {
 const TutorialHeader = () => (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
-      <Header aria-label="Carbon Tutorial">
+      <Header aria-label="IBM MQ showcase">
         <SkipToContent />
         <HeaderMenuButton
           aria-label="Open menu"
           onClick={onClickSideNavExpand}
           isActive={isSideNavExpanded}
         />
-        <HeaderName element={Link} to="/" prefix="IBM">
-          Carbon Tutorial
+        <HeaderName element={Link} to="/" prefix="IBM MQ">
+          showcase
         </HeaderName>
         <HeaderNavigation aria-label="Carbon Tutorial">
-          <HeaderMenuItem href="/repos">Repositories</HeaderMenuItem>
+          <HeaderMenuItem href="https://www.ibm.com/uk-en/products/mq">
+            Getting started
+          </HeaderMenuItem>
+        </HeaderNavigation>
+        <HeaderNavigation aria-label="Carbon Tutorial">
+          <HeaderMenuItem href="https://github.com/ibm-messaging/mq-dev-patterns.git">
+            Repositories
+          </HeaderMenuItem>
         </HeaderNavigation>
         <SideNav
           aria-label="Side navigation"
