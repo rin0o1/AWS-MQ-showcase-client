@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import { GroupedBarChart } from '@carbon/charts-react';
+import { LineChart } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
 // Or
 // import "@carbon/charts/styles/styles.scss";
@@ -10,11 +10,17 @@ import '@carbon/charts/styles.css';
 import './chart.css';
 
 const DEFAULTOPTION = {
-  title: 'Queue Manager 1',
+  title: 'Queue manager 1',
   axes: {
+    bottom: {
+      title: 'Time',
+      mapsTo: 'time',
+      scaleType: 'linear',
+    },
     left: {
       mapsTo: 'value',
       title: 'Queues depth',
+      scaleType: 'linear',
       thresholds: [
         {
           value: 5000,
@@ -23,19 +29,13 @@ const DEFAULTOPTION = {
         },
       ],
     },
-    bottom: {
-      scaleType: 'labels',
-      mapsTo: 'key',
-      title: 'Queues',
-    },
   },
+  curve: 'curveMonotoneX',
   height: '500px',
 };
 
-const Chart2 = props => {
-  const [options, setOption] = useState(DEFAULTOPTION);
-
-  return <GroupedBarChart data={props.data} options={options} />;
+const Chart1 = props => {
+  return <LineChart data={props.data} options={DEFAULTOPTION} />;
 };
 
-export default Chart2;
+export default Chart1;
