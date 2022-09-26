@@ -27,7 +27,18 @@ class APIAdapter {
       },
     });
   }
-  async getFromLimit(limit) {}
+
+  async getFromLimit(limit) {
+    let result = undefined;
+    try {
+      let _result = await axios.get(END_POINT_GET + limit);
+      result = _result.data;
+    } catch (e) {
+      console.log('Error on getting messages');
+    }
+
+    return result;
+  }
 }
 
 export default APIAdapter;

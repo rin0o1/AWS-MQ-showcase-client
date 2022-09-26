@@ -29,7 +29,7 @@ const DEFAULTOPTION = {
       title: 'Queues',
     },
   },
-  height: '500px',
+  height: '350px',
 };
 
 const Chart2 = props => {

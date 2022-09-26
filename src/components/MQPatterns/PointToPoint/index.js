@@ -1,43 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Column, Button } from '@carbon/react';
+import { Grid, Column, Button, PrimaryButton } from '@carbon/react';
 import Chart1 from './chart1';
 import Chart2 from './chart2';
 import APIAdapter from '../../../adapters/API.adapter';
 import './index.scss';
-
-const DEFAULT_CHART_VALUE_CHART_2 = [
-  {
-    group: 'Queue 1',
-    key: 'Q1',
-    value: 2500,
-  },
-];
-
-const DEFAULT_CHART_VALUE_CHART_1 = [
-  {
-    group: 'Queue 1',
-    time: '0',
-    value: 0,
-  },
-];
+import { color } from '@carbon/charts/configuration-non-customizable';
 
 const PointPointIndex = props => {
-  const [dataChart1, setDataChart1] = useState(DEFAULT_CHART_VALUE_CHART_1);
+  const [dataChart1, setDataChart1] = useState([]);
+  const [dataChart2, setDataChart2] = useState([]);
   const [time, setTime] = useState(1);
-  const [dataChart2, setDataChart2] = useState(DEFAULT_CHART_VALUE_CHART_2);
-  const [activeSender, setActiveSender] = useState();
-  const [activeReceiver, setActiveReceiver] = useState();
+  const [isActiveProducer, setIsActiveProducer] = useState();
+  const [isActiveConsumer, setIsActiveConsumer] = useState();
 
   const adapter = new APIAdapter();
 
   useEffect(() => {
-    if (activeSender) {
+    if (isActiveProducer) {
       const interval = setInterval(async () => {
         try {
-          adapter.put('Hello from client', 1);
+          const min = 10;
+          const max = 100;
+          let randomQuantity = generateRandomNumber(min, max);
+          adapter.put('Hello from client', randomQuantity);
           let result = await adapter.getAllDepths();
           updateChart(result);
-          console.log(result);
+        } catch (e) {
+          console.log(e);
+        }
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  });
+
+  function generateRandomNumber(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  useEffect(() => {
+    if (isActiveConsumer) {
+      const interval = setInterval(async () => {
+        try {
+          const min = 10;
+          const max = 100;
+          let randomQuantity = generateRandomNumber(min, max);
+          let messages = await adapter.getFromLimit(randomQuantity);
+          let result = await adapter.getAllDepths();
+          updateChart(result);
         } catch (e) {
           console.log(e);
         }
@@ -55,26 +64,27 @@ const PointPointIndex = props => {
         // updating Chart1
         let group = queue['name'];
         let depth = parseInt(queue['depth']);
+
         _dataChart1.push({
-          group: 'QUEUE' + group,
+          group: 'QUEUE ' + group,
           time: time,
-          value: depth * 10,
+          value: depth,
         });
 
         // updating Chart2
         // if is not the first time the dataset is populated
-        if (dataChart2.length > 1) {
+        if (dataChart2.length > 0) {
           // for each queue update the last depth
           let i = 0;
           _dataChart2.forEach(e => {
             if (e['key'] === queue['name']) {
-              _dataChart2[i]['value'] = parseInt(queue['depth']) * 10;
+              _dataChart2[i]['value'] = parseInt(queue['depth']);
             }
             i = i + 1;
           });
         } else {
           _dataChart2.push({
-            group: 'QUEUE' + group,
+            group: 'QUEUE ' + group,
             key: group,
             value: depth,
           });
@@ -85,24 +95,6 @@ const PointPointIndex = props => {
       setTime(time + 1);
     }
   }
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     let lastDepth = dataChart2[1]['value'];
-  //     let _dataChart1 = [...dataChart1];
-  //     _dataChart1.push({
-  //       group: 'Queue1',
-  //       time: time,
-  //       value: lastDepth + 100,
-  //     });
-  //     let _dataChart2 = [...dataChart2];
-  //     _dataChart2[1]['value'] = lastDepth + 100;
-  //     setDataChart2(_dataChart2);
-  //     setDataChart1(_dataChart1);
-  //     setTime(time + 1);
-  //   }, 2000);
-  //   return () => clearInterval(interval);
-  // });
 
   return (
     <Grid className="tabs-group-content">
@@ -121,29 +113,43 @@ const PointPointIndex = props => {
         <Grid>
           <Column md={4} lg={{ offset: 1 }} sm={2}>
             <Button
+              tooltip="hello"
+              kind={isActiveProducer ? 'primary' : 'secondary'}
               onClick={() => {
-                setActiveSender(!activeSender);
+                setIsActiveProducer(!isActiveProducer);
               }}>
-              Active/Stop Sender
+              {isActiveProducer ? 'Stop' : 'Start'} Producer
             </Button>
           </Column>
           <Column md={4} lg={{ offset: 13 }} sm={2}>
             <Button
+              kind={isActiveConsumer ? 'primary' : 'secondary'}
               onClick={() => {
-                setActiveReceiver(!activeReceiver);
+                setIsActiveConsumer(!isActiveConsumer);
               }}>
-              Active/Stop Receiver
+              {isActiveConsumer ? 'Stop' : 'Start'} Consumer
             </Button>
           </Column>
         </Grid>
-        <Grid className="chartSection">
-          <Column md={7} lg={{ offset: 1 }} sm={3}>
-            <Chart1 data={dataChart1} />
-          </Column>
-          <Column md={8} lg={{ offset: 8 }} sm={3}>
-            <Chart2 data={dataChart2} />
-          </Column>
-        </Grid>
+        {dataChart1.length > 1 && dataChart1.length > 1 ? (
+          <Grid className="chartSection">
+            <Column md={7} lg={{ offset: 1 }} sm={3}>
+              <Chart1 data={dataChart1} />
+            </Column>
+            <Column md={8} lg={{ offset: 8 }} sm={3}>
+              <Chart2 data={dataChart2} />
+            </Column>
+          </Grid>
+        ) : (
+          <Grid className="chartSection">
+            <Column md={8} lg={{ offset: 5 }} sm={4}>
+              <p className="landing-page__p">
+                Start either the Producer or the Consumer to test the effect of
+                this pattern.
+              </p>
+            </Column>
+          </Grid>
+        )}
       </Column>
     </Grid>
   );
