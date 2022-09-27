@@ -5,7 +5,7 @@ import Chart2 from './chart2';
 import APIAdapter from '../../../adapters/API.adapter';
 import './index.scss';
 import { color } from '@carbon/charts/configuration-non-customizable';
-
+import CustomNodeFlow from './map';
 const PointPointIndex = props => {
   const [dataChart1, setDataChart1] = useState([]);
   const [dataChart2, setDataChart2] = useState([]);
@@ -109,7 +109,8 @@ const PointPointIndex = props => {
           consectetur.
         </p>
       </Column>
-      <Column md={8} lg={16} sm={4} className="landing-page__r2">
+
+      <Column md={8} lg={16} sm={4}>
         <Grid>
           <Column md={4} lg={{ offset: 1 }} sm={2}>
             <Button

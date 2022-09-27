@@ -27,7 +27,7 @@ const DEFAULTOPTION = {
     },
   },
   curve: 'curveMonotoneX',
-  height: '350px',
+  height: '400px',
 };
 
 const Chart1 = props => {
